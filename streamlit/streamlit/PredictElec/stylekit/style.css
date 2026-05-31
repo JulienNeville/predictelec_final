@@ -1,0 +1,240 @@
+/* stylekit/style.css */
+
+/* Variables (mode clair par défaut) */
+:root {
+  --brand-primary: #2E8B57;     /* SeaGreen */
+  --brand-primary-600: #257A4D;
+  --brand-primary-200: #CDE7DB;
+
+  --surface: #F6F8FA;
+  --surface-alt: #FFFFFF;
+  --border: #E5E7EB;
+
+  --text: #1F2937;          /* Gray-800 */
+  --text-muted: #6B7280;    /* Gray-500 */
+
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger:  #DC2626;
+  --info:    #2563EB;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 6px 16px rgba(0,0,0,.08);
+}
+
+/* Titres / textes */
+h1, h2, h3, h4, h5 { color: var(--text); letter-spacing: .2px; }
+h1 { font-weight: 800; }
+a { color: var(--brand-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Cartes / blocs */
+.block { background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
+.block--elevated { box-shadow: var(--shadow-md); }
+.block--muted { background: var(--surface); }
+
+/* Badges */
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.85rem;
+  border:1px solid var(--border);color:var(--text);background:#fff;}
+.badge--success{border-color:var(--success);color:var(--success);}
+.badge--warning{border-color:var(--warning);color:var(--warning);}
+.badge--danger{border-color:var(--danger);color:var(--danger);}
+.badge--info{border-color:var(--info);color:var(--info);}
+
+/* Boutons */
+.stButton > button {
+  border-radius: 10px !important; padding: .6rem 1.1rem !important;
+  border: 1px solid var(--brand-primary-600) !important;
+  background: var(--brand-primary) !important; color: #fff !important;
+  font-weight: 600 !important; box-shadow: var(--shadow-sm) !important;
+}
+.stButton > button:hover { background: var(--brand-primary-600) !important; }
+.btn-ghost { display:inline-block; padding:.55rem 1rem; border-radius:10px;
+  border:1px solid var(--border); color:var(--text); background:transparent; }
+.btn-ghost:hover { background: var(--surface); }
+
+/* Inputs */
+.stTextInput input, .stNumberInput input, .stDateInput input {
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+}
+
+/* Metrics */
+[data-testid="stMetric"] {
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 14px;
+}
+[data-testid="stMetric"] div { color: var(--text); }
+
+/* Tabs (pills) */
+.stTabs [data-baseweb="tab-list"] { gap:.25rem;background:var(--surface);
+  padding:.25rem;border-radius:999px; }
+.stTabs [data-baseweb="tab"] { border-radius:999px; padding:.4rem .8rem; }
+.stTabs [aria-selected="true"] { background:var(--surface-alt); border:1px solid var(--border); }
+
+/* Alertes */
+.alert { padding:12px 14px; border-radius:8px; border:1px solid var(--border); background:var(--surface); }
+.alert--success { border-color:#16A34A; background:#ECFDF5; }
+.alert--warning { border-color:#D97706; background:#FFFBEB; }
+.alert--danger  { border-color:#DC2626; background:#FEF2F2; }
+.alert--info    { border-color:#2563EB; background:#EFF6FF; }
+
+/* Sidebar */
+section[data-testid="stSidebar"] { background: var(--surface); border-right:1px solid var(--border); }
+
+/* Tableaux */
+thead tr th { background: var(--surface); }
+
+/* Bannières */
+.hero { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 10px; }
+
+
+
+/* 1) Cache l'en-tête du menu multipages Streamlit */
+section[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* 2) Cache aussi le conteneur nav (selon versions Streamlit) */
+div[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* 3) Cache les items individuels de pages (fallback) */
+ul[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* 4) Supprime aussi la zone de séparation */
+nav[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* ===========================================================
+   ROBUST SIDEBAR FIX — LISIBILITÉ TOTALE (MODE SOMBRE & CLAIR)
+   Compatible Streamlit 2024–2026 (toutes structures internes)
+   =========================================================== */
+
+/* 1) Cibler toutes les implémentations possibles de la sidebar */
+div[data-testid="stSidebar"],
+aside[data-testid="stSidebar"],
+nav[data-testid="stSidebar"],
+section[data-testid="stSidebar"] {
+    color: var(--text) !important;
+}
+
+/* 2) Appliquer cette couleur à *tous* les descendants */
+div[data-testid="stSidebar"] *,
+aside[data-testid="stSidebar"] *,
+nav[data-testid="stSidebar"] *,
+section[data-testid="stSidebar"] * {
+    color: var(--text) !important;
+    fill: var(--text) !important;       /* SVG */
+}
+
+/* 3) LIENS ROOT (page_link rendus en <a>) */
+div[data-testid="stSidebar"] a,
+aside[data-testid="stSidebar"] a,
+nav[data-testid="stSidebar"] a,
+section[data-testid="stSidebar"] a {
+    color: var(--text) !important;
+    font-weight: 700 !important;        /* lisibilité 1er niveau */
+    text-decoration: none !important;
+}
+
+/* 4) LIENS RENDUS EN BOUTONS (<button data-baseweb="button">) */
+div[data-testid="stSidebar"] button[data-baseweb="button"],
+aside[data-testid="stSidebar"] button[data-baseweb="button"],
+nav[data-testid="stSidebar"] button[data-baseweb="button"],
+section[data-testid="stSidebar"] button[data-baseweb="button"] {
+    color: var(--text) !important;
+    font-weight: 700 !important;
+    background: transparent !important;
+    border: none !important;
+    text-align: left !important;
+    width: 100% !important;
+    padding: .45rem .4rem !important;
+    border-radius: 8px !important;
+}
+
+/* 5) TITRES D'EXPANDER (ex. "Données", "Machine Learning") */
+div[data-testid="stSidebar"] details > summary,
+aside[data-testid="stSidebar"] details > summary,
+nav[data-testid="stSidebar"] details > summary,
+section[data-testid="stSidebar"] details > summary {
+    color: var(--text) !important;
+    font-weight: 800 !important;
+    background: var(--surface-alt) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    padding: .55rem .7rem !important;
+    cursor: pointer !important;
+    list-style: none !important;
+}
+
+/* 6) SECOND NIVEAU (sous-pages dans expander) */
+div[data-testid="stSidebar"] details[open] a,
+aside[data-testid="stSidebar"] details[open] a,
+nav[data-testid="stSidebar"] details[open] a,
+section[data-testid="stSidebar"] details[open] a,
+div[data-testid="stSidebar"] details[open] button[data-baseweb="button"],
+aside[data-testid="stSidebar"] details[open] button[data-baseweb="button"],
+nav[data-testid="stSidebar"] details[open] button[data-baseweb="button"],
+section[data-testid="stSidebar"] details[open] button[data-baseweb="button"] {
+    color: var(--text) !important;
+    font-weight: 600 !important;
+    padding: .35rem .3rem !important;
+    border-radius: 8px !important;
+}
+
+/* 7) ÉTATS HOVER — lisibilité et professionnalisme */
+div[data-testid="stSidebar"] a:hover,
+aside[data-testid="stSidebar"] a:hover,
+nav[data-testid="stSidebar"] a:hover,
+section[data-testid="stSidebar"] a:hover,
+div[data-testid="stSidebar"] button[data-baseweb="button"]:hover,
+aside[data-testid="stSidebar"] button[data-baseweb="button"]:hover,
+nav[data-testid="stSidebar"] button[data-baseweb="button"]:hover,
+section[data-testid="stSidebar"] button[data-baseweb="button"]:hover {
+    color: var(--brand-primary) !important;
+    background: rgba(60, 213, 141, 0.12) !important;
+}
+
+/* 8) FOCUS CLAVIER (accessibilité AAA) */
+div[data-testid="stSidebar"] a:focus,
+aside[data-testid="stSidebar"] a:focus,
+nav[data-testid="stSidebar"] a:focus,
+section[data-testid="stSidebar"] a:focus,
+div[data-testid="stSidebar"] button[data-baseweb="button"]:focus,
+aside[data-testid="stSidebar"] button[data-baseweb="button"]:focus,
+nav[data-testid="stSidebar"] button[data-baseweb="button"]:focus,
+section[data-testid="stSidebar"] button[data-baseweb="button"]:focus {
+    outline: 2px solid var(--brand-primary) !important;
+    outline-offset: 2px !important;
+    border-radius: 8px !important;
+}
+
+/* 9) PASSER LES SVG EN MODE ADAPTATIF (adoptent texte clair en sombre) */
+div[data-testid="stSidebar"] svg,
+aside[data-testid="stSidebar"] svg,
+nav[data-testid="stSidebar"] svg,
+section[data-testid="stSidebar"] svg {
+    fill: currentColor !important;
+}
+
+/* ================================================
+   PATCH SÉCURISÉ : désactive uniquement l’icône fullscreen
+   ================================================ */
+
+/* Masque le SVG (icône) */
+svg[data-testid="stElementToolbarButtonIcon"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Masque son bouton conteneur SANS retirer pointer-events ailleurs */
+button:has(svg[data-testid="stElementToolbarButtonIcon"]) {
+    display: none !important;
+}

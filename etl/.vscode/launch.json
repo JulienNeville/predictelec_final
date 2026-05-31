@@ -1,0 +1,18 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "python", /* "debugpy" non fonctionnel -> ne voit pas les points d'arrêt*/
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false, /* false: permet de déboguer dans les packages externes */
+            "stopOnEntry": false, /* true: s'arrête dès le début du programme */
+            "subProcess": true /* capture les process enfants*/
+        }
+    ]
+}

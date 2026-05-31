@@ -1,0 +1,104 @@
+version: "3.8"
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:2.8.1
+  env_file:
+    - .env
+  environment:
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    # temps de chargement dag
+    AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: 300
+    # DB Airflow (métadonnées)
+    # préciser la cible du postgres de airflow car plusieurs postgres running
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres-1/airflow
+
+    # Broker Celery (queue)
+    AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+
+    # Backend résultats Celery
+    # préciser la cible du postgres de airflow car plusieurs postgres running
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@airflow-postgres-1/airflow
+
+    # Sécurité (IMPORTANT sinon erreurs 403 logs)
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+
+    # Parallelisme global :6 min(prevision) + 2 autre
+    AIRFLOW__CORE__PARALLELISM: 10
+
+    # Nombre max de tâches par DAG (16 possibles)
+    # pour 3 workers : 4*3 = 12 (max users api) : en lancant --scale aiflow-worker=3
+    # pour 2 workers : 2*4 + les autres tâches seront en attente 
+    #AIRFLOW__CORE__DAG_CONCURRENCY: 2
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: 10
+    
+    #fixe aussi explicitement le nb de workers : max 2 sur 1 vCPU
+    #limit à 1 pour garantir un contrôle précis du débit global et éviter saturation de l'API
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: 5
+
+    #évite quun worker aspire trop de tasks
+    AIRFLOW__CELERY__WORKER_PREFETCH_MULTIPLIER: 1
+
+    # Chargement plugins
+    PYTHONPATH: /opt/predictelec/current/predictelec:/opt/airflow/plugins
+
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - /opt/predictelec:/opt/predictelec
+
+  depends_on:
+    - postgres
+    - redis
+
+# -------------------------
+# SERVICES
+# -------------------------
+
+services:
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-airflow-volume:/var/lib/postgresql/data
+  redis:
+    image: redis:latest
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+
+  airflow-worker:
+    <<: *airflow-common
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: celery worker
+  
+  airflow-init:
+    <<: *airflow-common
+    command: bash -c "airflow db init && airflow users create \
+      --username admin \
+      --password admin \
+      --firstname admin \
+      --lastname admin \
+      --role Admin \
+      --email dtslioradejuin2025@free.fr"
+
+volumes:
+  postgres-db-airflow-volume:

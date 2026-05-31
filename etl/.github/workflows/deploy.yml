@@ -1,0 +1,40 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches: [ main ]   # ou la branche que tu utilises
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Copy file via SSH password
+          uses: appleboy/scp-action@v1
+          with:
+            host: ${{ secrets.SERVER_HOST }}
+            username: ${{ secrets.SERVER_USER }}
+            password: ${{ secrets.SERVER_PASSWORD }}
+            port: 22
+            target: predictelec
+            source: .
+            rm: true
+        - name: Setup venv and restart app (SSH)
+          uses: appleboy/ssh-action@v1
+          with:
+            host: ${{ secrets.SERVER_HOST }}
+            username: ${{ secrets.SERVER_USER }}
+            password: ${{ secrets.SERVER_PASSWORD }}
+            port: 22
+            script: |
+              cd predictelec
+              python3 -m venv .venv
+              . .venv/bin/activate
+              which python
+              python -V
+              pip -V
+              pip install --upgrade pip
+              pip install -r requirements.txt
+
